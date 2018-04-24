@@ -8,7 +8,7 @@ The preferred way to install this extension is through [composer](https://getcom
 
 Either run
 ~~~
-php composer.phar require ircsasw/finkok-helper ~1.0.0
+php composer.phar require ircsasw/finkok-helper
 ~~~
 or add
 ~~~
