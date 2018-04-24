@@ -30,8 +30,8 @@ class Finkok
      */
     private $url;
 
-    protected $response;
-    protected $pre_stamped = false;
+    public $response;
+    public $pre_stamped = false;
 
     /**
      * Arreglo de errores ocurridos
@@ -46,12 +46,22 @@ class Finkok
         $this->url = $sandbox ? 'https://demo-facturacion.finkok.com/servicios/soap/' : 'https://facturacion.finkok.com/servicios/soap/';
     }
 
+    /**
+     * Define los datos de acceso al Web Service
+     * @param string $username
+     * @param string $password
+     */
     public function setCredentials($username, $password)
     {
         $this->username = $username;
         $this->password = $password;
     }
 
+    /**
+     * Timbra el archivo XML proporcionado
+     * @param  string $xml ruta al archivo XML
+     * @return boolean     si es timbrado o no
+     */
     public function timbrar($xml = null)
     {
         if (is_null($xml)) {
@@ -70,17 +80,36 @@ class Finkok
             return false;
         }
 
+        // Lee el archivo XML
+        $partes_ruta = pathinfo($xml);
+        $invoice_path = $xml;
+        $xml_file = fopen($invoice_path, "rb");
+        $xml_content = fread($xml_file, filesize($invoice_path));
+        fclose($xml_file);
+
         $soap = new SoapClient("{$this->url}stamp.wsdl", [
             'trace' => 1
         ]);
 
         $response = $soap->__soapCall('stamp', [
             [
-                "xml" => $xml,
+                "xml" => $xml_content,
                 "username" => $this->username,
                 "password" => $this->password
             ]
         ]);
+
+        // Genera archivo .xml con el Request del web service
+        $soapRequest = $partes_ruta['dirname'] . DIRECTORY_SEPARATOR . 'SoapRequest.xml';
+        $file = fopen($soapRequest, "a");
+        fwrite($file, $soap->__getLastRequest() . "\n");
+        fclose($file);
+
+        // Generación de archivo .xml con el Response del web service
+        $soapResponse = $partes_ruta['dirname'] . DIRECTORY_SEPARATOR . 'SoapResponse.xml';
+        $file = fopen($soapResponse, "a");
+        fwrite($file, $soap->__getLastResponse() . "\n");
+        fclose($file);
 
         if (property_exists($response->stampResult->Incidencias, 'Incidencia') && $response->stampResult->Incidencias->Incidencia->CodigoError == 307) {
             $this->response = $response->stampResult;
