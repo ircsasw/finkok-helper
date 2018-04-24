@@ -1,0 +1,30 @@
+{
+    "name": "ircsasw/finkok-helper",
+    "description": "Librería auxiliar para el uso del webservice del PAC Fonkok.",
+    "keywords": ["finkok", "pac", "cfdi", "timbrado"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Arturo Ramos",
+            "email": "ircsasw@gmail.com"
+        }
+    ],
+    "type": "library",
+    "require": {
+        "php": ">=5.4.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "5.2.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "ircsasw\\finkok\\": "src/"
+        }
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://asset-packagist.org"
+        }
+    ]
+}
